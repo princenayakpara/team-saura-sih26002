@@ -156,16 +156,25 @@ export class MLService {
 
   private invokePythonInference(features: MLFeaturePayload): Promise<MLPredictionData | null> {
     return new Promise((resolve) => {
-      const pythonPath = path.resolve(
+      const pythonPathWin = path.resolve(
         __dirname,
         '../../../../services/ml/venv/Scripts/python.exe'
       );
+      const pythonPathBin = path.resolve(
+        __dirname,
+        '../../../../services/ml/venv/bin/python.exe'
+      );
+      const pythonPath = fs.existsSync(pythonPathWin)
+        ? pythonPathWin
+        : fs.existsSync(pythonPathBin)
+          ? pythonPathBin
+          : null;
       const scriptPath = path.resolve(
         __dirname,
         '../../../../services/ml/src/classifier_service.py'
       );
 
-      if (!fs.existsSync(pythonPath) || !fs.existsSync(scriptPath)) {
+      if (!pythonPath || !fs.existsSync(scriptPath)) {
         return resolve(null);
       }
 
