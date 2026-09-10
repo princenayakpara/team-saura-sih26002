@@ -16,31 +16,45 @@ This guide describes the local development setup, environment configurations, an
 
 ---
 
-## 2. Environment Configuration
+## 2. Automated Setup (Recommended)
 
-Copy `.env.example` to `.env` in the repository root:
+To set up and run the entire SauraRoute ecosystem on Windows from scratch in two commands:
 
-```ini
-# --- API Port ---
-API_PORT=3000
+### Step 1: Run Automated Setup Script
+```powershell
+.\scripts\setup.ps1
+```
+This script automatically:
+* Verifies system tools (Java 17, Node >= 20, Python 3.10+).
+* Provisions root `.env` from `.env.example`.
+* Creates `data/raw`, `data/processed`, and `services/ml/models` directories.
+* Downloads `graphhopper-web-10.2.jar` (~44.2 MB) from Maven Central into `data/raw/` if missing.
+* Downloads `north-eastern-zone-latest.osm.pbf` (~109 MB) from Geofabrik into `data/raw/` if missing.
+* Installs npm dependencies for `@sauraroute/api` and `apps/web`.
+* Configures Python virtual environment and trains the baseline ML classifier.
 
-# --- Database Configurations ---
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=sauraroute_db
-DB_USER=postgres
-DB_PASSWORD=sauraroute_dev_2026
-DB_URL=postgresql://postgres:sauraroute_dev_2026@localhost:5432/sauraroute_db
+### Step 2: Start All Services
+```powershell
+.\scripts\start.ps1
+```
+Launches:
+* **GraphHopper 10.2**: `http://localhost:8989` (Admin: `http://localhost:8990/healthcheck`)
+* **SauraRoute API**: `http://localhost:3000` (Health: `http://localhost:3000/api/health`)
+* **Web Dashboard**: `http://localhost:5173`
 
-# --- GraphHopper Routing ---
-GRAPHHOPPER_URL=http://localhost:8989
-GRAPHHOPPER_TIMEOUT_MS=5000
-GRAPHHOPPER_PROFILE=car
+### Step 3: Run Health Diagnostics
+```powershell
+.\scripts\check.ps1
+```
+
+### Step 4: Stop All Services
+```powershell
+.\scripts\stop.ps1
 ```
 
 ---
 
-## 3. How to Start Each Service
+## 3. Manual Service Configuration & Execution
 
 ### Service A: Local GraphHopper Routing Engine (`services/routing`)
 1. From the repository root (requires Java 17):

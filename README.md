@@ -59,6 +59,35 @@ The North Eastern Region (NER) of India faces unique geographical, meteorologica
 
 ---
 
+## Quick Start (Fresh Developer Clone)
+
+For any fresh clone on Windows, get the complete SauraRoute platform running in **two simple commands**:
+
+### 1. Run Automated Setup (One-time)
+Checks system prerequisites (Java 17, Node >= 20, Python), provisions `.env`, creates directories, installs npm dependencies, downloads the GraphHopper 10.2 JAR and North-East OSM road network data, and trains baseline ML models:
+```powershell
+.\scripts\setup.ps1
+```
+
+### 2. Start the SauraRoute Stack
+Launches GraphHopper (:8989), API service (:3000), and Web dashboard (:5173):
+```powershell
+.\scripts\start.ps1
+```
+
+### 3. Verify System Health & Diagnostics
+Runs automated diagnostic probes against all runtime binaries, assets, and live HTTP services:
+```powershell
+.\scripts\check.ps1
+```
+
+### 4. Stop Services
+```powershell
+.\scripts\stop.ps1
+```
+
+---
+
 ## Technology Stack
 * **Frontend (Web):** React, TypeScript, TailwindCSS, MapLibre GL JS, Vite
 * **Backend API Service:** Node.js, TypeScript, Express, PostGIS / PostgreSQL (`pg`)
