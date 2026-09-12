@@ -1,0 +1,31 @@
+{
+  "header": {
+    "title": "SAURAROUTE",
+    "subtitle": "AI Logistics & Resilience Intelligence",
+    "region": "NER CORRIDOR",
+    "live": "LIVE",
+    "disconnected": "DISCONNECTED",
+    "operationsMode": "HQ Operations",
+    "driverMode": "Driver Nav"
+  },
+  "role": {
+    "title": "Select Operations Role",
+    "operations": "Command Center",
+    "operationsDesc": "Regional monitoring, risk assessment & fleet coordination",
+    "driver": "Driver Navigation",
+    "driverDesc": "Turn-by-turn guidance with live terrain hazard alerts"
+  },
+  "alerts": {
+    "title": "Active Road Alerts",
+    "liveRouteAlert": "LIVE ROUTE ALERT",
+    "noAlerts": "No active accessibility alerts.",
+    "viewAffected": "View Affected Segment",
+    "recalculate": "Recalculate Safer Route"
+  },
+  "language": {
+    "select": "Language",
+    "en": "English",
+    "hi": "हिंदी",
+    "as": "অসমীয়া"
+  }
+}
