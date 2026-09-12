@@ -59,6 +59,25 @@ The North Eastern Region (NER) of India faces unique geographical, meteorologica
 
 ---
 
+## Quick Start (Fresh Machine Setup)
+
+Fresh Windows clones can be initialized and started with **two commands**:
+
+```powershell
+# 1. Prepare runtime assets, directories, and package dependencies:
+.\setup.ps1
+
+# 2. Start GraphHopper (:8989), API (:3000), and Web UI (:5173):
+.\start.ps1
+
+# 3. Optional: Run health check & endpoint verification:
+.\check.ps1
+```
+
+For detailed configuration instructions and manual execution steps, see [docs/engineering-setup.md](file:///c:/Users/Admin/Desktop/SIH/team-saura-sih26002/docs/engineering-setup.md).
+
+---
+
 ## Technology Stack
 * **Frontend (Web):** React, TypeScript, TailwindCSS, MapLibre GL JS, Vite
 * **Backend API Service:** Node.js, TypeScript, Express, PostGIS / PostgreSQL (`pg`)

@@ -16,7 +16,34 @@ This guide describes the local development setup, environment configurations, an
 
 ---
 
-## 2. Environment Configuration
+## 2. Quick Automated Setup & Launch Workflow
+
+Fresh developer clones can prepare, launch, and verify the entire SauraRoute stack with three automated scripts:
+
+### Step 1: Automated Local Setup
+Runs prerequisite checks, creates required data directories, copies `.env.example` -> `.env`, downloads and verifies GraphHopper 10.2 JAR and NER OpenStreetMap extract (`.osm.pbf`), and installs Node.js & Python dependencies:
+
+```powershell
+.\setup.ps1
+```
+
+### Step 2: Stack Launcher
+Launches local GraphHopper (`:8989`), API service (`:3000`), and Web dashboard (`:5173`) in background process windows and prints active URLs:
+
+```powershell
+.\start.ps1
+```
+
+### Step 3: Health & Dependency Verification
+Verifies presence and file integrity of runtime data assets and tests live HTTP endpoints:
+
+```powershell
+.\check.ps1
+```
+
+---
+
+## 3. Environment Configuration
 
 Copy `.env.example` to `.env` in the repository root:
 
