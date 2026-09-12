@@ -34,7 +34,7 @@ function Start-ServiceWindow {
 
   Write-Host "  [+] Launching $Title..." -ForegroundColor Cyan
   $psCmd = "cd `"$WorkingDir`"; Write-Host '=== $Title ===' -ForegroundColor Cyan; $Command"
-  Start-Process powershell.exe -ArgumentList "-NoExit", "-Command", $psCmd -WindowStyle Normal
+  Start-Process powershell.exe -ArgumentList "-NoExit", "-Command", $psCmd
 }
 
 Write-Host "`nLaunching local SauraRoute microservices..." -ForegroundColor Yellow
