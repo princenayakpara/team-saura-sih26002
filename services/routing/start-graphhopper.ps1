@@ -15,20 +15,23 @@ if ($HeapGiB -lt 1) {
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $repoRoot = (Resolve-Path (Join-Path $scriptDir '..\..')).Path
 
-# Helper to test if an executable is Java 17
+# Helper to test if an executable is Java 17 or higher
 function Test-IsJava17 {
   param([string]$Cmd)
   try {
     $out = cmd.exe /c "`"$Cmd`" -version 2>&1"
     $firstLine = ($out | Select-Object -First 1)
-    if ($firstLine -match 'version "17\.') {
-      return $firstLine
+    if ($firstLine -match 'version "(\d+)\.') {
+      $major = [int]$Matches[1]
+      if ($major -ge 17) {
+        return $firstLine
+      }
     }
   } catch { }
   return $null
 }
 
-# Auto-detect Java 17 if default 'java' is not on PATH or not version 17
+# Auto-detect Java 17+ if default 'java' is not on PATH or not version 17+
 $resolvedJava = $JavaCommand
 $detectedVersion = Test-IsJava17 $resolvedJava
 
@@ -39,10 +42,17 @@ if (-not $detectedVersion -and $JavaCommand -eq 'java') {
   }
   $searchPatterns = @(
     'C:\Program Files\Eclipse Adoptium\*17*\bin\java.exe',
+    'C:\Program Files\Eclipse Adoptium\*21*\bin\java.exe',
+    'C:\Program Files\Eclipse Adoptium\*\bin\java.exe',
     'C:\Program Files\Java\*17*\bin\java.exe',
+    'C:\Program Files\Java\*21*\bin\java.exe',
+    'C:\Program Files\Java\*\bin\java.exe',
     'C:\Program Files\Microsoft\*17*\bin\java.exe',
+    'C:\Program Files\Microsoft\*21*\bin\java.exe',
     'C:\Program Files\Amazon Corretto\*17*\bin\java.exe',
-    'C:\Program Files\Semeru\*17*\bin\java.exe'
+    'C:\Program Files\Amazon Corretto\*21*\bin\java.exe',
+    'C:\Program Files\Semeru\*17*\bin\java.exe',
+    'C:\Program Files\Android\Android Studio\jbr\bin\java.exe'
   )
   foreach ($pat in $searchPatterns) {
     $found = Get-Item $pat -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
@@ -54,7 +64,7 @@ if (-not $detectedVersion -and $JavaCommand -eq 'java') {
     if ($ver) {
       $resolvedJava = $cand
       $detectedVersion = $ver
-      Write-Host "[SauraRoute Routing] Auto-detected Java 17 at: $cand" -ForegroundColor Green
+      Write-Host "[SauraRoute Routing] Auto-detected Java 17+ at: $cand" -ForegroundColor Green
       break
     }
   }
