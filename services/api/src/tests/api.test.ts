@@ -271,6 +271,41 @@ async function runTests() {
     assert.strictEqual(updated.status, 'REJECTED');
   });
 
+  await test('Operator verification workflow: explicitly verifies UNVERIFIED report to VERIFIED state', async () => {
+    // 1. Create UNVERIFIED driver observation
+    const observation = await incidentService.createIncident({
+      type: 'FALLEN_ROCKS',
+      severity: 'CRITICAL',
+      description: 'Active rockfall on GS Road near Nongpoh',
+      latitude: 25.9021,
+      longitude: 91.8012,
+    });
+    assert.strictEqual(observation.status, 'REPORTED', 'Initial status must be REPORTED (UNVERIFIED)');
+
+    // 2. Operator verifies observation (REPORTED -> VERIFIED)
+    const verified = await incidentService.updateIncidentStatus(observation.id, 'VERIFIED');
+    assert.ok(verified, 'Update must return the updated record');
+    assert.strictEqual(verified.id, observation.id);
+    assert.strictEqual(verified.status, 'VERIFIED', 'Status must transition to VERIFIED');
+
+    // 3. Verify that listIncidents exposes the verified status
+    const list = await incidentService.listIncidents();
+    const match = list.features.find((f) => f.properties.id === observation.id);
+    assert.ok(match);
+    assert.strictEqual(match.properties.status, 'VERIFIED');
+
+    // 4. Verification does not corrupt terminal state transitions
+    assert.throws(
+      () => validateStatusTransition('RESOLVED', 'VERIFIED'),
+      (err: Error) => err instanceof ValidationError
+    );
+  });
+
+  await test('Incident status update rejects unknown incident ID', async () => {
+    const result = await incidentService.updateIncidentStatus('inc_non_existent_999', 'VERIFIED');
+    assert.strictEqual(result, null, 'Updating non-existent incident must return null');
+  });
+
   console.log('\n--- 3. Accessibility API & Alerts ---');
 
   const accessibilityGeometry = {

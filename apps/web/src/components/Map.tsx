@@ -53,6 +53,7 @@ interface MapProps {
   selectedRoute: CandidateRouteProfile | null;
   baselineRoute: CandidateRouteProfile | null;
   isDriverMode?: boolean;
+  onSelectIncident?: (id: string) => void;
 }
 
 export const MapComponent = forwardRef<MapHandle, MapProps>(function MapComponent(
@@ -65,6 +66,7 @@ export const MapComponent = forwardRef<MapHandle, MapProps>(function MapComponen
     selectedRoute,
     baselineRoute,
     isDriverMode = false,
+    onSelectIncident,
   },
   ref
 ) {
@@ -86,6 +88,11 @@ export const MapComponent = forwardRef<MapHandle, MapProps>(function MapComponen
     hazardZones: hazardZonesData,
     accessibility: accessibilityData,
   });
+
+  const onSelectIncidentRef = useRef(onSelectIncident);
+  useEffect(() => {
+    onSelectIncidentRef.current = onSelectIncident;
+  }, [onSelectIncident]);
 
   const routeDataRef = useRef<{
     selected: CandidateRouteProfile | null;
@@ -456,6 +463,10 @@ export const MapComponent = forwardRef<MapHandle, MapProps>(function MapComponen
           const props = f.properties;
           const geom = f.geometry as { type: string; coordinates: [number, number] };
           const coordinates = geom.coordinates.slice() as [number, number];
+
+          if (props.id && onSelectIncidentRef.current) {
+            onSelectIncidentRef.current(props.id);
+          }
 
           new maplibregl.Popup({ offset: 12 })
             .setLngLat(coordinates)
