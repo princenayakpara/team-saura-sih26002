@@ -27,7 +27,7 @@ import {
   listAccessibility,
   updateAccessibilityStatus,
 } from '../controllers/accessibility.controller.js';
-import { listAlerts } from '../controllers/alert.controller.js';
+import { listAlerts, getRouteAlerts } from '../controllers/alert.controller.js';
 import { resetDemoState } from '../controllers/demo.controller.js';
 
 const router = Router();
@@ -58,6 +58,7 @@ router.delete('/accessibility/:id', deleteAccessibility);
 
 // Current computed accessibility alerts
 router.get('/alerts', listAlerts);
+router.post('/alerts/route', getRouteAlerts);
 
 // Routing
 router.get('/routes', getRoute);

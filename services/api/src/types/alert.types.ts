@@ -39,3 +39,29 @@ export interface AlertRecord {
 export interface AlertCollection {
   items: AlertRecord[];
 }
+
+export interface DriverRouteAlert {
+  id: string;
+  category: 'ROAD_CLOSURE' | 'ROAD_RESTRICTION' | 'VERIFIED_HAZARD';
+  severity: 'CRITICAL' | 'WARNING' | 'INFO';
+  headline: string;
+  title: string;
+  message: string;
+  status: string;
+  isVerified: boolean;
+  affectedCorridorOrLocation: string;
+  distanceAheadMeters: number;
+  distanceLabel: string;
+  requiresReroute: boolean;
+  actionLabel: string;
+  secondaryActionLabel: string;
+  created_at: string;
+}
+
+export interface DriverRouteAlertResult {
+  hasAlert: boolean;
+  activeAlert: DriverRouteAlert | null;
+  alerts: DriverRouteAlert[];
+  totalAlertsCount: number;
+  computedAt: string;
+}

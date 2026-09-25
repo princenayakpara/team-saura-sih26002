@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type {
   RouteOptimizationResult,
   AlertRecord,
   RerouteEvaluationResult,
+  DriverRouteAlertResult,
 } from '../../types/api';
 import type { LiveTripProgress } from '../../utils/eta';
 import DriverHeader from './DriverHeader';
@@ -11,6 +12,7 @@ import DriverManeuverCard from './DriverManeuverCard';
 import DriverNavigationCard from './DriverNavigationCard';
 import DriverEtaBar from './DriverEtaBar';
 import DriverSafetyBanner from './DriverSafetyBanner';
+import DriverRouteAlertCard from './DriverRouteAlertCard';
 import DriverRouteSummary from './DriverRouteSummary';
 import DriverSafetyStatus from './DriverSafetyStatus';
 import DriverBottomNav from './DriverBottomNav';
@@ -62,6 +64,40 @@ export default function DriverMode({
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<DriverTab>('navigate');
   const [isReportingIssue, setIsReportingIssue] = useState<boolean>(false);
+  const [routeAlertResult, setRouteAlertResult] = useState<DriverRouteAlertResult | null>(null);
+  const [dismissedAlertId, setDismissedAlertId] = useState<string | null>(null);
+
+  const fetchRouteAlerts = useCallback(async () => {
+    if (!optimization?.selectedRoute?.geometry?.coordinates?.length) {
+      setRouteAlertResult(null);
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:3000/api/alerts/route', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ geometry: optimization.selectedRoute.geometry }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setRouteAlertResult(json.data as DriverRouteAlertResult);
+      }
+    } catch {
+      // fallback
+    }
+  }, [optimization]);
+
+  useEffect(() => {
+    fetchRouteAlerts();
+    const interval = setInterval(fetchRouteAlerts, 4000);
+    return () => clearInterval(interval);
+  }, [fetchRouteAlerts]);
+
+  const activeRouteAlert =
+    routeAlertResult?.activeAlert && dismissedAlertId !== routeAlertResult.activeAlert.id
+      ? routeAlertResult.activeAlert
+      : null;
 
   const showMapOverlay = Boolean(optimization) && activeTab === 'navigate';
 
@@ -94,6 +130,19 @@ export default function DriverMode({
           </div>
 
           <div className="driver-map-bottom">
+            {/* Prominent M7 Route-Specific Driver Alert */}
+            {activeRouteAlert && (
+              <div style={{ marginBottom: 8 }}>
+                <DriverRouteAlertCard
+                  alert={activeRouteAlert}
+                  onReviewSaferRoute={onCheckReroute}
+                  onViewWhatsAhead={() => setActiveTab('ahead')}
+                  onDismiss={() => setDismissedAlertId(activeRouteAlert.id)}
+                  canReroute={!isCheckingReroute}
+                />
+              </div>
+            )}
+
             {/* Quick-Action Report Road Issue Floating Prompt */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 6 }}>
               <button
@@ -175,6 +224,15 @@ export default function DriverMode({
             </div>
           ) : activeTab === 'safety' ? (
             <div className="driver-stack">
+              {activeRouteAlert && (
+                <DriverRouteAlertCard
+                  alert={activeRouteAlert}
+                  onReviewSaferRoute={onCheckReroute}
+                  onViewWhatsAhead={() => setActiveTab('ahead')}
+                  onDismiss={() => setDismissedAlertId(activeRouteAlert.id)}
+                  canReroute={!isCheckingReroute}
+                />
+              )}
               <DriverSafetyStatus
                 selectedRoute={optimization.selectedRoute}
                 safetyStatus={optimization.safetyIntelligence}
