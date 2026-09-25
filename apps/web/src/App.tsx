@@ -171,39 +171,39 @@ export default function App() {
   }, []);
 
   // Fetch Accessibility & Alerts Polling (10s)
-  useEffect(() => {
-    const fetchAccessibilityData = async () => {
-      try {
-        const accRes = await fetch(`${API_BASE_URL}/accessibility`);
-        if (accRes.ok) {
-          const accData = (await accRes.json()) as AccessibilityFeatureCollection;
-          setAccessibility(accData);
-          setAccessibilityUnavailable(false);
-        } else {
-          setAccessibilityUnavailable(true);
-        }
-      } catch {
+  const fetchAccessibilityData = useCallback(async () => {
+    try {
+      const accRes = await fetch(`${API_BASE_URL}/accessibility`);
+      if (accRes.ok) {
+        const accData = (await accRes.json()) as AccessibilityFeatureCollection;
+        setAccessibility(accData);
+        setAccessibilityUnavailable(false);
+      } else {
         setAccessibilityUnavailable(true);
       }
+    } catch {
+      setAccessibilityUnavailable(true);
+    }
 
-      try {
-        const alertRes = await fetch(`${API_BASE_URL}/alerts`);
-        if (alertRes.ok) {
-          const payload = (await alertRes.json()) as { data?: AlertCollection };
-          setAlerts(payload.data?.items ?? []);
-          setAlertsUnavailable(false);
-        } else {
-          setAlertsUnavailable(true);
-        }
-      } catch {
+    try {
+      const alertRes = await fetch(`${API_BASE_URL}/alerts`);
+      if (alertRes.ok) {
+        const payload = (await alertRes.json()) as { data?: AlertCollection };
+        setAlerts(payload.data?.items ?? []);
+        setAlertsUnavailable(false);
+      } else {
         setAlertsUnavailable(true);
       }
-    };
+    } catch {
+      setAlertsUnavailable(true);
+    }
+  }, []);
 
+  useEffect(() => {
     fetchAccessibilityData();
     const interval = setInterval(fetchAccessibilityData, 10_000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchAccessibilityData]);
 
   // Fetch Incidents & Vehicles Polling (2.5s)
   const fetchTelemetry = useCallback(async () => {
@@ -246,6 +246,35 @@ export default function App() {
       clearInterval(interval);
     };
   }, [fetchTelemetry]);
+
+  // Reset Demo to baseline state (Restores corridors, clears demo state)
+  const handleResetDemo = async () => {
+    try {
+      await fetch(`${API_BASE_URL}/demo/reset`, { method: 'POST' });
+      await Promise.all([fetchTelemetry(), fetchAccessibilityData()]);
+      setOptimization(null);
+      setRerouteResult(null);
+      setRoutingError(null);
+      setRerouteError(null);
+      setSelectedIncidentId(null);
+      setTripStartTime(null);
+    } catch (err) {
+      console.error('Demo reset error:', err);
+    }
+  };
+
+  // Handle Incident Verification / Updates -> Refetches Telemetry, Corridors & Re-evaluates Active Route
+  const handleIncidentUpdated = async () => {
+    await Promise.all([fetchTelemetry(), fetchAccessibilityData()]);
+    if (optimization) {
+      void handleCalculateRoute(
+        `${optimization.origin.latitude}, ${optimization.origin.longitude}`,
+        `${optimization.destination.latitude}, ${optimization.destination.longitude}`,
+        destinationLabel,
+        viewMode === 'driver' || isDriverMode ? 'cargo_truck' : 'car'
+      );
+    }
+  };
 
   // Handle Route Calculation (supports optional destination label for driver guidance)
   const handleCalculateRoute = async (
@@ -399,6 +428,7 @@ export default function App() {
         setShowLegend={setShowLegend}
         viewMode={viewMode || 'operations'}
         onToggleViewMode={handleToggleViewMode}
+        onResetDemo={handleResetDemo}
       />
 
       {/* 2. MapLibre Hero Viewport */}
@@ -450,7 +480,7 @@ export default function App() {
             setTripStartTime(null);
           }}
           liveProgress={liveProgress}
-          onIncidentReported={fetchTelemetry}
+          onIncidentReported={handleIncidentUpdated}
         />
       )}
 
@@ -525,7 +555,7 @@ export default function App() {
             {/* Road Observations & Verification Workflow */}
             <ObservationPanel
               incidentsData={incidents}
-              onIncidentUpdated={fetchTelemetry}
+              onIncidentUpdated={handleIncidentUpdated}
               selectedIncidentId={selectedIncidentId}
               onSelectIncident={setSelectedIncidentId}
               onFocusCoordinates={(coords) => {

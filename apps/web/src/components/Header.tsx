@@ -17,6 +17,7 @@ interface HeaderProps {
   setShowLegend: Dispatch<SetStateAction<boolean>>;
   viewMode: 'operations' | 'driver';
   onToggleViewMode: () => void;
+  onResetDemo?: () => void;
 }
 
 export default function Header({
@@ -34,6 +35,7 @@ export default function Header({
   setShowLegend,
   viewMode,
   onToggleViewMode,
+  onResetDemo,
 }: HeaderProps) {
   const { t } = useTranslation();
 
@@ -91,6 +93,27 @@ export default function Header({
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         {viewMode === 'operations' && (
           <>
+            {onResetDemo && (
+              <button
+                type="button"
+                onClick={onResetDemo}
+                className="btn-preset"
+                title="Reset Demo to Initial Baseline State"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  borderColor: 'rgba(239, 68, 68, 0.4)',
+                  color: '#F87171',
+                  backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                  fontWeight: 600,
+                }}
+              >
+                <Icon name="refresh" size={13} color="#F87171" />
+                <span>Reset Demo</span>
+              </button>
+            )}
+
             <button
               onClick={() => setShowLeftPanel(!showLeftPanel)}
               className={`btn-preset ${showLeftPanel ? 'active' : ''}`}

@@ -12,9 +12,79 @@ import {
 import type { RouteGeometry } from '../types/routing.types.js';
 import { ValidationError } from '../utils/validation.js';
 
+// Baseline seeded corridors for NER highway network
+function createInitialCorridors(): Map<string, AccessibilityRecord> {
+  const now = new Date().toISOString();
+  return new Map<string, AccessibilityRecord>([
+    [
+      'acc_nh6_nongpoh',
+      {
+        id: 'acc_nh6_nongpoh',
+        name: 'NH-6 GS Road Corridor (Nongpoh Segment)',
+        road_code: 'NH-6',
+        status: 'OPEN',
+        reason: 'All lanes open for regular commercial transit',
+        source: 'National Highway Authority / State PWD',
+        geometry: {
+          type: 'LineString',
+          coordinates: [
+            [91.7821, 25.9810],
+            [91.8012, 25.9021],
+            [91.8400, 25.7800],
+          ],
+        },
+        created_at: now,
+        updated_at: now,
+      },
+    ],
+    [
+      'acc_nh27_tezpur',
+      {
+        id: 'acc_nh27_tezpur',
+        name: 'NH-27 / NH-15 North Bank Corridor',
+        road_code: 'NH-27',
+        status: 'OPEN',
+        reason: 'Normal transit',
+        source: 'Assam PWD',
+        geometry: {
+          type: 'LineString',
+          coordinates: [
+            [91.7362, 26.1445],
+            [92.1500, 26.3500],
+            [92.5000, 26.5000],
+            [92.7926, 26.6338],
+          ],
+        },
+        created_at: now,
+        updated_at: now,
+      },
+    ],
+    [
+      'acc_sh5_cherrapunji',
+      {
+        id: 'acc_sh5_cherrapunji',
+        name: 'SH-5 Sohra Hill Pass',
+        road_code: 'SH-5',
+        status: 'OPEN',
+        reason: 'Normal transit',
+        source: 'Meghalaya PWD',
+        geometry: {
+          type: 'LineString',
+          coordinates: [
+            [91.8933, 25.5788],
+            [91.8300, 25.4200],
+            [91.7323, 25.2702],
+          ],
+        },
+        created_at: now,
+        updated_at: now,
+      },
+    ],
+  ]);
+}
+
 // In-memory fallback store (authoritative when PostGIS is unavailable).
-// Seeded dataset is added in a later Step-9 commit.
-const inMemoryAccessibility = new Map<string, AccessibilityRecord>();
+const inMemoryAccessibility = createInitialCorridors();
 
 function validateAccessibilityStatus(status: unknown): AccessibilityStatus {
   if (typeof status !== 'string' || !VALID_ACCESSIBILITY_STATUSES.includes(status as AccessibilityStatus)) {
@@ -306,6 +376,60 @@ export class AccessibilityService {
       // Inclusive boundary: distance <= tolerance counts as affected.
       return distance <= toleranceMeters;
     });
+  }
+
+  /**
+   * Connects a VERIFIED incident to corridor accessibility closure.
+   * Only VERIFIED incidents trigger closure. Unverified / Rejected incidents are ignored.
+   */
+  async handleIncidentVerification(incident: {
+    id: string;
+    type: string;
+    description: string;
+    latitude: number;
+    longitude: number;
+    status: string;
+  }): Promise<AccessibilityRecord[]> {
+    if (incident.status !== 'VERIFIED') {
+      return [];
+    }
+
+    const records = await this.listAccessibility();
+    const updatedCorridors: AccessibilityRecord[] = [];
+    const incidentPoint: [number, number] = [Number(incident.longitude), Number(incident.latitude)];
+
+    for (const record of records) {
+      let minDistance = Number.POSITIVE_INFINITY;
+      const coords = record.geometry.coordinates;
+      for (let i = 0; i < coords.length - 1; i++) {
+        const dist = pointToSegmentDistanceMeters(incidentPoint, coords[i], coords[i + 1]);
+        if (dist < minDistance) minDistance = dist;
+      }
+
+      // Proximity threshold: within 2500m of the corridor segment
+      if (minDistance <= 2500) {
+        if (record.status === 'OPEN' || record.status === 'RESTRICTED') {
+          const reason = `Verified ${incident.type}: ${incident.description}`;
+          const updated = await this.updateAccessibilityStatus(record.id, 'CLOSED', reason);
+          if (updated) {
+            updatedCorridors.push(updated);
+          }
+        }
+      }
+    }
+
+    return updatedCorridors;
+  }
+
+  /**
+   * Resets accessibility corridors to baseline initial state (OPEN).
+   */
+  async resetAccessibilityState(): Promise<void> {
+    const initial = createInitialCorridors();
+    inMemoryAccessibility.clear();
+    for (const [key, value] of initial.entries()) {
+      inMemoryAccessibility.set(key, value);
+    }
   }
 
   private rowToRecord(row: {

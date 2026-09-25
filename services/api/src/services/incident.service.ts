@@ -9,6 +9,7 @@ import {
   IncidentRecord,
 } from '../types/incident.types.js';
 import { validateStatusTransition } from '../utils/validation.js';
+import { accessibilityService } from './accessibility.service.js';
 
 // Extend the incident data model to support photoUrl and photoUrls
 declare module '../types/incident.types.js' {
@@ -23,26 +24,31 @@ export interface IncidentRecordWithPhoto extends IncidentRecord {
   photoUrls?: string[];
 }
 
+function createInitialIncidents(): Map<string, IncidentRecord> {
+  const now = new Date().toISOString();
+  return new Map<string, IncidentRecord>([
+    [
+      'inc_sample_001',
+      {
+        id: 'inc_sample_001',
+        type: 'LANDSLIDE',
+        severity: 'CRITICAL',
+        description: 'Major rockfall on NH-40 near Nongpoh',
+        latitude: 25.9021,
+        longitude: 91.8012,
+        status: 'REPORTED',
+        created_at: now,
+        updated_at: now,
+        resolved_at: null,
+        photoUrl: null,
+        photoUrls: [],
+      },
+    ],
+  ]);
+}
+
 // In-memory store fallback with initial seed data
-const inMemoryIncidents = new Map<string, IncidentRecord>([
-  [
-    'inc_sample_001',
-    {
-      id: 'inc_sample_001',
-      type: 'LANDSLIDE',
-      severity: 'CRITICAL',
-      description: 'Major rockfall on NH-40 near Nongpoh',
-      latitude: 25.9021,
-      longitude: 91.8012,
-      status: 'REPORTED',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      resolved_at: null,
-      photoUrl: null,
-      photoUrls: [],
-    },
-  ],
-]);
+const inMemoryIncidents = createInitialIncidents();
 
 export class IncidentService {
   async createIncident(params: {
@@ -227,12 +233,17 @@ export class IncidentService {
           `;
           const { rows } = await client.query(query, [newStatus, id]);
           const mem = inMemoryIncidents.get(id);
-          const record = {
+            const record = {
             ...rows[0],
             photoUrl: mem?.photoUrl ?? null,
             photoUrls: mem?.photoUrls ?? [],
           } as IncidentRecord;
           inMemoryIncidents.set(record.id, record);
+
+          if (newStatus === 'VERIFIED') {
+            await accessibilityService.handleIncidentVerification(record);
+          }
+
           return record;
         } finally {
           client.release();
@@ -252,7 +263,23 @@ export class IncidentService {
     if (newStatus === 'RESOLVED') {
       existing.resolved_at = now;
     }
+
+    if (newStatus === 'VERIFIED') {
+      await accessibilityService.handleIncidentVerification(existing);
+    }
+
     return existing;
+  }
+
+  /**
+   * Resets incident store to baseline initial state.
+   */
+  async resetIncidentState(): Promise<void> {
+    const initial = createInitialIncidents();
+    inMemoryIncidents.clear();
+    for (const [key, value] of initial.entries()) {
+      inMemoryIncidents.set(key, value);
+    }
   }
 }
 

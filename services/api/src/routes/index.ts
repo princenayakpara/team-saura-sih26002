@@ -28,8 +28,12 @@ import {
   updateAccessibilityStatus,
 } from '../controllers/accessibility.controller.js';
 import { listAlerts } from '../controllers/alert.controller.js';
+import { resetDemoState } from '../controllers/demo.controller.js';
 
 const router = Router();
+
+// Demo scenario reset
+router.post('/demo/reset', resetDemoState);
 
 // Health
 router.get('/health', healthCheck);
