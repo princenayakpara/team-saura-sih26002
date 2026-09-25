@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Header from './components/Header';
 import MapComponent from './components/Map';
 import type { MapHandle } from './components/Map';
@@ -204,35 +204,46 @@ export default function App() {
   }, []);
 
   // Fetch Incidents & Vehicles Polling (2.5s)
+  const fetchTelemetry = useCallback(async () => {
+    try {
+      const [incRes, vhRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/incidents`),
+        fetch(`${API_BASE_URL}/vehicles`),
+      ]);
+
+      if (incRes.ok) {
+        const incData = (await incRes.json()) as IncidentFeatureCollection;
+        setIncidents(incData);
+      }
+
+      if (vhRes.ok) {
+        const vhData = (await vhRes.json()) as VehicleFeatureCollection;
+        setVehicles(vhData);
+      }
+
+      setIsLive(true);
+      setLastUpdated(new Date().toLocaleTimeString());
+    } catch {
+      setIsLive(false);
+    }
+  }, []);
+
   useEffect(() => {
-    const fetchTelemetry = async () => {
-      try {
-        const [incRes, vhRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/incidents`),
-          fetch(`${API_BASE_URL}/vehicles`),
-        ]);
-
-        if (incRes.ok) {
-          const incData = (await incRes.json()) as IncidentFeatureCollection;
-          setIncidents(incData);
-        }
-
-        if (vhRes.ok) {
-          const vhData = (await vhRes.json()) as VehicleFeatureCollection;
-          setVehicles(vhData);
-        }
-
-        setIsLive(true);
-        setLastUpdated(new Date().toLocaleTimeString());
-      } catch {
-        setIsLive(false);
+    let isSubscribed = true;
+    const load = async () => {
+      if (isSubscribed) {
+        await fetchTelemetry();
       }
     };
-
-    fetchTelemetry();
-    const interval = setInterval(fetchTelemetry, 2500);
-    return () => clearInterval(interval);
-  }, []);
+    void load();
+    const interval = setInterval(() => {
+      void fetchTelemetry();
+    }, 2500);
+    return () => {
+      isSubscribed = false;
+      clearInterval(interval);
+    };
+  }, [fetchTelemetry]);
 
   // Handle Route Calculation (supports optional destination label for driver guidance)
   const handleCalculateRoute = async (
@@ -436,6 +447,7 @@ export default function App() {
             setTripStartTime(null);
           }}
           liveProgress={liveProgress}
+          onIncidentReported={fetchTelemetry}
         />
       )}
 

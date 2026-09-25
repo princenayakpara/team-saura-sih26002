@@ -155,8 +155,9 @@ async function runTests() {
     );
   });
 
-  await test('validateIncidentType accepts LANDSLIDE and rejects INVALID_TYPE', () => {
+  await test('validateIncidentType accepts LANDSLIDE, FALLEN_ROCKS and rejects INVALID_TYPE', () => {
     assert.strictEqual(validateIncidentType('LANDSLIDE'), 'LANDSLIDE');
+    assert.strictEqual(validateIncidentType('FALLEN_ROCKS'), 'FALLEN_ROCKS');
     assert.throws(
       () => validateIncidentType('VOLCANO'),
       (err: Error) => err instanceof ValidationError
@@ -201,6 +202,34 @@ async function runTests() {
   });
 
   console.log('\n--- 2. Incident Service & GeoJSON Standards ---');
+
+  await test('Driver road observation: creates UNVERIFIED incident with photo metadata and appears in Operations list', async () => {
+    const report = await incidentService.createIncident({
+      type: 'FALLEN_ROCKS',
+      severity: 'CRITICAL',
+      description: 'Large boulders blocking southbound lane on GS Road near Nongpoh',
+      latitude: 25.9021,
+      longitude: 91.8012,
+      photoUrl: '/uploads/incident-test-boulder.jpg',
+      photoUrls: ['/uploads/incident-test-boulder.jpg'],
+    });
+
+    // Verify initial unverified state
+    assert.ok(report.id.startsWith('inc_'), 'Report must have a unique ID');
+    assert.strictEqual(report.status, 'REPORTED', 'Report must initialize as REPORTED (unverified)');
+    assert.strictEqual(report.type, 'FALLEN_ROCKS');
+    assert.strictEqual(report.severity, 'CRITICAL');
+    assert.strictEqual(report.photoUrl, '/uploads/incident-test-boulder.jpg');
+
+    // Verify visibility in Operations listIncidents
+    const geoJson = await incidentService.listIncidents();
+    const match = geoJson.features.find(f => f.properties.id === report.id);
+    assert.ok(match, 'Report must be immediately visible in Operations incidents list');
+    assert.strictEqual(match.properties.status, 'REPORTED');
+    assert.strictEqual(match.properties.type, 'FALLEN_ROCKS');
+    assert.strictEqual(match.geometry.coordinates[0], 91.8012);
+    assert.strictEqual(match.geometry.coordinates[1], 25.9021);
+  });
 
   await test('IncidentService creates and lists incidents in GeoJSON format', async () => {
     const incident = await incidentService.createIncident({

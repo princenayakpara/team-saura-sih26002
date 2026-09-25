@@ -8,6 +8,7 @@ interface DriverSafetyBannerProps {
   onViewSafety: () => void;
   onCheckReroute: () => void;
   canReroute: boolean;
+  onReportIssue?: () => void;
 }
 
 export default function DriverSafetyBanner({
@@ -16,6 +17,7 @@ export default function DriverSafetyBanner({
   onViewSafety,
   onCheckReroute,
   canReroute,
+  onReportIssue,
 }: DriverSafetyBannerProps) {
   const routeAlerts = alerts.filter((a) => a.routeCandidateId || a.severity === 'CRITICAL');
   const activeAlert = routeAlerts[0];
@@ -67,6 +69,21 @@ export default function DriverSafetyBanner({
         <button type="button" className="driver-safety-btn" onClick={onViewSafety}>
           Safety Details
         </button>
+        {onReportIssue && (
+          <button
+            type="button"
+            className="driver-safety-btn"
+            style={{
+              borderColor: 'rgba(239, 68, 68, 0.4)',
+              color: '#F87171',
+              backgroundColor: 'rgba(239, 68, 68, 0.12)',
+              fontWeight: 600,
+            }}
+            onClick={onReportIssue}
+          >
+            Report Issue
+          </button>
+        )}
         <button
           type="button"
           className="driver-safety-btn driver-safety-btn-primary"

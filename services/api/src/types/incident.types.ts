@@ -1,5 +1,6 @@
 export type IncidentType =
   | 'LANDSLIDE'
+  | 'FALLEN_ROCKS'
   | 'FLOOD'
   | 'ROAD_DAMAGE'
   | 'ACCIDENT'
@@ -17,6 +18,7 @@ export type IncidentStatus =
 
 export const VALID_INCIDENT_TYPES: IncidentType[] = [
   'LANDSLIDE',
+  'FALLEN_ROCKS',
   'FLOOD',
   'ROAD_DAMAGE',
   'ACCIDENT',

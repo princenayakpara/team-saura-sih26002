@@ -468,6 +468,7 @@ export const MapComponent = forwardRef<MapHandle, MapProps>(function MapComponen
                 <div style="font-size: 13px; font-weight: 700; color: #F8FAFC; margin-bottom: 4px;">
                   ${props.description}
                 </div>
+                ${props.photoUrl ? `<div style="margin-bottom: 6px; border-radius: 4px; overflow: hidden; max-height: 120px;"><img src="http://localhost:3000${props.photoUrl}" alt="Evidence" style="width: 100%; max-height: 120px; object-fit: cover; display: block; border-radius: 4px;" onerror="this.style.display='none'" /></div>` : ''}
                 <div style="font-size: 10px; color: #94A3B8; border-top: 1px solid #334155; padding-top: 4px;">
                   Status: <strong>${props.status}</strong> | ID: <code>${props.id}</code>
                 </div>

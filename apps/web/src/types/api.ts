@@ -13,6 +13,8 @@ export interface IncidentFeature {
     createdAt: string;
     updatedAt: string;
     resolvedAt?: string | null;
+    photoUrl?: string | null;
+    photoUrls?: string[];
   };
 }
 

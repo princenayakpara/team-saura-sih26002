@@ -31,7 +31,8 @@ export type IconName =
   | 'target'
   | 'info'
   | 'refresh'
-  | 'bulb';
+  | 'bulb'
+  | 'camera';
 
 interface IconProps extends SVGProps<SVGSVGElement> {
   name: IconName;
@@ -329,6 +330,14 @@ export const Icon: FC<IconProps> = ({
           <path d="M9 18h6" />
           <path d="M10 22h4" />
           <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5.76.76 1.23 1.52 1.41 2.5" />
+        </svg>
+      );
+
+    case 'camera':
+      return (
+        <svg {...commonProps}>
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+          <circle cx="12" cy="13" r="4" />
         </svg>
       );
 
