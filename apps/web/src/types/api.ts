@@ -246,3 +246,27 @@ export interface RerouteEvaluationResult {
   evaluatedCandidatesCount: number;
   accessibility?: AccessibilitySummary;
 }
+
+export type WhatsAheadCategory = 'INCIDENT' | 'CORRIDOR_CLOSED' | 'CORRIDOR_RESTRICTED';
+
+export interface WhatsAheadItem {
+  id: string;
+  category: WhatsAheadCategory;
+  title: string;
+  type: string;
+  status: string;
+  severity: string;
+  description: string;
+  isVerified: boolean;
+  distanceAheadMeters: number;
+  distanceLabel: string;
+  locationContext: string;
+  priority: number;
+  coordinates: [number, number];
+}
+
+export interface WhatsAheadResult {
+  items: WhatsAheadItem[];
+  totalCount: number;
+  computedAt: string;
+}

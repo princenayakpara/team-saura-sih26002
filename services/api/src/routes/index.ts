@@ -10,7 +10,7 @@ import {
   listVehicles,
   updateVehicleLocation,
 } from '../controllers/vehicle.controller.js';
-import { getRoute, optimizeRoute, rerouteRoute } from '../controllers/route.controller.js';
+import { getRoute, optimizeRoute, rerouteRoute, getWhatsAhead } from '../controllers/route.controller.js';
 import {
   getPointRisk,
   evaluateRouteRisk,
@@ -63,6 +63,7 @@ router.get('/alerts', listAlerts);
 router.get('/routes', getRoute);
 router.post('/routes/optimize', optimizeRoute);
 router.post('/routes/reroute', rerouteRoute);
+router.post('/routes/whats-ahead', getWhatsAhead);
 
 // Risk Intelligence
 router.get('/risk/point', getPointRisk);

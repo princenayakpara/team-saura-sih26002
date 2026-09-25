@@ -1,7 +1,7 @@
 import type { IconName } from '../common/Icon';
 import { Icon } from '../common/Icon';
 
-export type DriverTab = 'navigate' | 'route' | 'safety' | 'alerts' | 'more';
+export type DriverTab = 'navigate' | 'ahead' | 'route' | 'safety' | 'alerts' | 'more';
 
 interface DriverBottomNavProps {
   activeTab: DriverTab;
@@ -11,6 +11,7 @@ interface DriverBottomNavProps {
 
 const TABS: { key: DriverTab; label: string; icon: IconName }[] = [
   { key: 'navigate', label: 'Navigate', icon: 'compass' },
+  { key: 'ahead', label: 'Ahead', icon: 'mountain' },
   { key: 'route', label: 'Route', icon: 'route' },
   { key: 'safety', label: 'Safety', icon: 'shield' },
   { key: 'alerts', label: 'Alerts', icon: 'bell' },

@@ -149,3 +149,37 @@ export async function rerouteRoute(req: Request, res: Response, next: NextFuncti
     handleRouteError(err, res, next);
   }
 }
+
+export async function getWhatsAhead(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { computeWhatsAhead } = await import('../services/whatsahead.service.js');
+    const body = req.body as { geometry?: { type?: string; coordinates?: unknown } };
+
+    if (!body?.geometry || body.geometry.type !== 'LineString' || !Array.isArray(body.geometry.coordinates) || body.geometry.coordinates.length < 2) {
+      res.status(400).json({
+        status: 'error',
+        message: 'Request body must include a valid GeoJSON LineString geometry with at least 2 coordinate pairs.',
+      });
+      return;
+    }
+
+    const coordinates = body.geometry.coordinates.map((pt: unknown, idx: number) => {
+      if (!Array.isArray(pt) || pt.length < 2 || typeof pt[0] !== 'number' || typeof pt[1] !== 'number') {
+        throw new ValidationError(`Geometry coordinate at index ${idx} must be [longitude, latitude] numbers.`);
+      }
+      return [pt[0], pt[1]] as [number, number];
+    });
+
+    const result = await computeWhatsAhead({
+      type: 'LineString',
+      coordinates,
+    });
+
+    res.json({
+      status: 'success',
+      data: result,
+    });
+  } catch (err) {
+    handleRouteError(err, res, next);
+  }
+}

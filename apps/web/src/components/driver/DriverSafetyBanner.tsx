@@ -6,6 +6,7 @@ interface DriverSafetyBannerProps {
   selectedRoute: CandidateRouteProfile;
   alerts: AlertRecord[];
   onViewSafety: () => void;
+  onViewAhead?: () => void;
   onCheckReroute: () => void;
   canReroute: boolean;
   onReportIssue?: () => void;
@@ -15,6 +16,7 @@ export default function DriverSafetyBanner({
   selectedRoute,
   alerts,
   onViewSafety,
+  onViewAhead,
   onCheckReroute,
   canReroute,
   onReportIssue,
@@ -66,6 +68,21 @@ export default function DriverSafetyBanner({
       </div>
 
       <div className="driver-safety-actions">
+        {onViewAhead && (
+          <button
+            type="button"
+            className="driver-safety-btn"
+            style={{
+              borderColor: 'rgba(245, 158, 11, 0.4)',
+              color: '#FBBF24',
+              backgroundColor: 'rgba(245, 158, 11, 0.1)',
+              fontWeight: 700,
+            }}
+            onClick={onViewAhead}
+          >
+            What&apos;s Ahead
+          </button>
+        )}
         <button type="button" className="driver-safety-btn" onClick={onViewSafety}>
           Safety Details
         </button>

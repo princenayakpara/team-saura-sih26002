@@ -17,6 +17,7 @@ import DriverBottomNav from './DriverBottomNav';
 import type { DriverTab } from './DriverBottomNav';
 import DriverTripStart from './DriverTripStart';
 import DriverReportIssue from './DriverReportIssue';
+import DriverWhatsAhead from './DriverWhatsAhead';
 import AlertsPanel from '../AlertsPanel';
 import ReroutePanel from '../ReroutePanel';
 import { Icon } from '../common/Icon';
@@ -123,6 +124,7 @@ export default function DriverMode({
             <DriverSafetyBanner
               selectedRoute={optimization.selectedRoute}
               alerts={alerts}
+              onViewAhead={() => setActiveTab('ahead')}
               onViewSafety={() => setActiveTab('safety')}
               onCheckReroute={onCheckReroute}
               canReroute={!isCheckingReroute}
@@ -139,6 +141,13 @@ export default function DriverMode({
               isRouting={isRouting}
               routingError={routingError}
               onExit={onExit}
+            />
+          ) : activeTab === 'ahead' ? (
+            <DriverWhatsAhead
+              selectedRoute={optimization.selectedRoute}
+              onCheckReroute={onCheckReroute}
+              canReroute={!isCheckingReroute}
+              onReportIssue={() => setIsReportingIssue(true)}
             />
           ) : activeTab === 'route' ? (
             <div className="driver-stack">
