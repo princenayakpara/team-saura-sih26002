@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Icon } from './common/Icon';
 
 interface HeaderProps {
@@ -34,6 +35,8 @@ export default function Header({
   viewMode,
   onToggleViewMode,
 }: HeaderProps) {
+  const { t } = useTranslation();
+
   return (
     <header className="command-header">
       {/* Brand / Logo */}
@@ -43,7 +46,7 @@ export default function Header({
         </div>
         <div>
           <div className="brand-title">SauraRoute</div>
-          <div className="brand-subtitle">North Eastern Region Corridor Intelligence</div>
+          <div className="brand-subtitle">{t('header.brandSubtitle')}</div>
         </div>
       </div>
 
@@ -57,30 +60,30 @@ export default function Header({
         className="desktop-telemetry"
       >
         <div className="tag-badge" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ color: 'var(--text-muted)', fontSize: 10 }}>REGION</span>
-          <span style={{ fontWeight: 600, color: 'var(--accent-action)' }}>NER Corridors</span>
+          <span style={{ color: 'var(--text-muted)', fontSize: 10 }}>{t('header.regionLabel')}</span>
+          <span style={{ fontWeight: 600, color: 'var(--accent-action)' }}>{t('header.regionValue')}</span>
         </div>
 
         <div className="tag-badge" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ color: 'var(--text-muted)', fontSize: 10 }}>FLEET</span>
-          <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{vehicleCount} Active</span>
+          <span style={{ color: 'var(--text-muted)', fontSize: 10 }}>{t('header.fleetLabel')}</span>
+          <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{t('header.fleetActive', { count: vehicleCount })}</span>
         </div>
 
         <div className="tag-badge" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ color: 'var(--text-muted)', fontSize: 10 }}>INCIDENTS</span>
+          <span style={{ color: 'var(--text-muted)', fontSize: 10 }}>{t('header.incidentsLabel')}</span>
           <span style={{ fontWeight: 600, color: incidentCount > 0 ? 'var(--status-caution)' : 'var(--text-muted)' }}>
-            {incidentCount} Reported
+            {t('header.incidentsReported', { count: incidentCount })}
           </span>
         </div>
 
         <div className="tag-badge" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ color: 'var(--text-muted)', fontSize: 10 }}>HAZARD ZONES</span>
-          <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{hazardZoneCount} Zones</span>
+          <span style={{ color: 'var(--text-muted)', fontSize: 10 }}>{t('header.hazardZonesLabel')}</span>
+          <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{t('header.hazardZonesValue', { count: hazardZoneCount })}</span>
         </div>
 
         <div className="tag-badge" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ color: 'var(--text-muted)', fontSize: 10 }}>CORRIDORS</span>
-          <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{accessibilityCount} Monitored</span>
+          <span style={{ color: 'var(--text-muted)', fontSize: 10 }}>{t('header.corridorsLabel')}</span>
+          <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{t('header.corridorsMonitored', { count: accessibilityCount })}</span>
         </div>
       </div>
 
@@ -93,7 +96,7 @@ export default function Header({
               className={`btn-preset ${showLeftPanel ? 'active' : ''}`}
               title={showLeftPanel ? 'Hide Route Planner' : 'Show Route Planner'}
             >
-              Planner
+              {t('header.planner')}
             </button>
 
             <button
@@ -101,7 +104,7 @@ export default function Header({
               className={`btn-preset ${showRightPanel ? 'active' : ''}`}
               title={showRightPanel ? 'Hide Intelligence Panel' : 'Show Intelligence Panel'}
             >
-              Intelligence
+              {t('header.intelligence')}
             </button>
 
             <button
@@ -109,7 +112,7 @@ export default function Header({
               className={`btn-preset ${showLegend ? 'active' : ''}`}
               title={showLegend ? 'Hide Map Legend' : 'Show Map Legend'}
             >
-              Legend
+              {t('header.legend')}
             </button>
           </>
         )}
@@ -128,12 +131,12 @@ export default function Header({
           }}
         >
           <Icon name={viewMode === 'driver' ? 'terminal' : 'truck'} size={14} />
-          <span>{viewMode === 'driver' ? 'Operations Console' : 'Driver Mode'}</span>
+          <span>{viewMode === 'driver' ? t('header.switchToOps') : t('header.switchToDriver')}</span>
         </button>
 
         <div className={`status-pill ${isLive ? 'live' : 'disconnected'}`} title={`Last refreshed: ${lastUpdated}`}>
           <span className="status-pulse" />
-          <span>{isLive ? 'LIVE' : 'OFFLINE'}</span>
+          <span>{isLive ? t('header.live') : t('header.offline')}</span>
         </div>
       </div>
     </header>

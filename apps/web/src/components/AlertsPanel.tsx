@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { AlertRecord } from '../types/api';
 import { Icon } from './common/Icon';
 
@@ -18,6 +19,8 @@ export default function AlertsPanel({
   onViewAffectedSegment,
   driverMode = false,
 }: AlertsPanelProps) {
+  const { t } = useTranslation();
+
   // Check if any alert affects the current route
   const routeAlerts = alerts.filter((a) => a.routeCandidateId || a.severity === 'CRITICAL');
   const hasRouteAlert = hasCalculatedRoute && routeAlerts.length > 0;
@@ -37,7 +40,7 @@ export default function AlertsPanel({
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--color-status-danger)', fontWeight: 700, fontSize: 12, marginBottom: 4 }}>
             <Icon name="alert-triangle" size={14} color="var(--color-status-danger)" />
-            <span>Live Route Alert</span>
+            <span>{t('alerts.liveRouteAlertLabel')}</span>
           </div>
           <div style={{ fontSize: 11, color: '#FCA5A5', lineHeight: 1.4, marginBottom: 8 }}>
             Hazard or obstruction detected on current route ({routeAlerts[0]?.title || 'Active Corridor Warning'}).
@@ -58,7 +61,7 @@ export default function AlertsPanel({
                   cursor: 'pointer',
                 }}
               >
-                View Affected Segment
+                {t('alerts.viewAffected')}
               </button>
             )}
             {onRecalculateSaferRoute && (
@@ -76,7 +79,7 @@ export default function AlertsPanel({
                   cursor: 'pointer',
                 }}
               >
-                {driverMode ? 'Find a safer route' : 'Recalculate Safer Route'}
+                {driverMode ? t('alerts.recalculateDriver') : t('alerts.recalculate')}
               </button>
             )}
           </div>
@@ -92,14 +95,14 @@ export default function AlertsPanel({
           }}
         >
           <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--color-status-safe)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-            Route Status
+            {t('alerts.routeStatus')}
           </div>
           <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--color-status-safe)', marginTop: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
             <Icon name="check" size={13} color="var(--color-status-safe)" />
-            <span>No active route alerts</span>
+            <span>{t('alerts.noActiveRouteAlerts')}</span>
           </div>
           <div style={{ fontSize: 10, color: 'var(--color-text-muted)', marginTop: 2 }}>
-            Route currently operating normally without active closures or critical disruptions.
+            {t('alerts.routeNormal')}
           </div>
         </div>
       )}
@@ -108,7 +111,7 @@ export default function AlertsPanel({
       <div className="intel-card-header" style={{ marginBottom: 6 }}>
         <span className="intel-card-title">
           <Icon name="bell" size={14} color="var(--color-accent-amber)" />
-          <span>{driverMode ? 'Highway Road Alerts' : 'Regional Highway Advisories'}</span>
+          <span>{driverMode ? t('alerts.driverAdvisories') : t('alerts.regionAdvisories')}</span>
         </span>
         <span
           style={{
@@ -120,14 +123,14 @@ export default function AlertsPanel({
             color: alerts.length > 0 ? 'var(--color-status-caution)' : 'var(--color-status-safe)',
           }}
         >
-          {alerts.length} Region Advisories
+          {t('alerts.regionAdvisoriesCount', { count: alerts.length })}
         </span>
       </div>
 
       {isUnavailable && (
         <div style={{ padding: '6px 8px', fontSize: 10, color: 'var(--color-status-caution)', display: 'flex', alignItems: 'center', gap: 5 }}>
           <Icon name="alert-triangle" size={12} color="var(--color-status-caution)" />
-          <span>Regional alerts service is temporarily offline.</span>
+          <span>{t('alerts.serviceOffline')}</span>
         </div>
       )}
 
@@ -159,7 +162,7 @@ export default function AlertsPanel({
                   </span>
                   {alert.routeCandidateId && (
                     <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--color-accent-amber)', backgroundColor: 'rgba(229, 152, 58, 0.15)', padding: '1px 5px', borderRadius: 3 }}>
-                      On Route
+                      {t('alerts.onRoute')}
                     </span>
                   )}
                 </div>

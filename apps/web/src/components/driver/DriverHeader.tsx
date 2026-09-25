@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface DriverHeaderProps {
   isLive: boolean;
@@ -6,6 +7,8 @@ interface DriverHeaderProps {
 }
 
 export default function DriverHeader({ isLive, onExit }: DriverHeaderProps) {
+  const { t } = useTranslation();
+
   const [now, setNow] = useState<string>(() =>
     new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   );
@@ -24,13 +27,13 @@ export default function DriverHeader({ isLive, onExit }: DriverHeaderProps) {
           SR
         </span>
         <span className="driver-header-name">SAURAROUTE</span>
-        <span className="driver-header-mode">DRIVER</span>
+        <span className="driver-header-mode">{t('driver.mode')}</span>
       </div>
 
       <div className="driver-header-status">
         <span className={`driver-status-chip ${isLive ? 'driver-status-on' : 'driver-status-off'}`}>
           <span className="driver-status-dot" />
-          <span>{isLive ? 'ONLINE' : 'OFFLINE'}</span>
+          <span>{isLive ? t('driver.online') : t('driver.offline')}</span>
         </span>
         <span className="driver-header-time">{now}</span>
         {onExit && (
@@ -38,10 +41,10 @@ export default function DriverHeader({ isLive, onExit }: DriverHeaderProps) {
             type="button"
             onClick={onExit}
             className="driver-header-exit-btn"
-            title="Switch to Operations Command Center"
-            aria-label="Switch to Operations Command Center"
+            title={t('driver.switchToOps')}
+            aria-label={t('driver.switchToOps')}
           >
-            Ops Center
+            {t('driver.opsCenter')}
           </button>
         )}
       </div>

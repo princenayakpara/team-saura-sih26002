@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Icon } from './common/Icon';
 
 interface RoleSelectProps {
@@ -5,6 +6,8 @@ interface RoleSelectProps {
 }
 
 export default function RoleSelect({ onSelectMode }: RoleSelectProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="role-select-backdrop" role="dialog" aria-modal="true" aria-labelledby="role-select-title">
       <div className="role-select-card">
@@ -15,14 +18,14 @@ export default function RoleSelect({ onSelectMode }: RoleSelectProps) {
             </div>
             <div>
               <div className="brand-title">SauraRoute</div>
-              <div className="brand-subtitle">AI Logistics &amp; Accessibility Intelligence</div>
+              <div className="brand-subtitle">{t('header.subtitle')}</div>
             </div>
           </div>
           <h2 id="role-select-title" className="role-select-title">
-            Choose Your Experience
+            {t('role.chooseExperience')}
           </h2>
           <p className="role-select-subtitle">
-            Select how you want to use SauraRoute today. You can switch modes at any time.
+            {t('role.chooseSubtitle')}
           </p>
         </div>
 
@@ -32,19 +35,18 @@ export default function RoleSelect({ onSelectMode }: RoleSelectProps) {
             type="button"
             className="role-option-btn role-option-driver"
             onClick={() => onSelectMode('driver')}
-            aria-label="Enter Driver Mode"
+            aria-label={t('role.driverName')}
           >
             <div className="role-option-icon" aria-hidden="true">
               <Icon name="truck" size={26} color="var(--color-accent-amber)" />
             </div>
             <div className="role-option-content">
               <div className="role-option-headline">
-                <span className="role-option-name">I'm Driving</span>
-                <span className="role-option-badge">Quick &amp; Hands-Free</span>
+                <span className="role-option-name">{t('role.driverName')}</span>
+                <span className="role-option-badge">{t('role.driverBadge')}</span>
               </div>
               <p className="role-option-desc">
-                One-tap trips using your current location, turn-by-turn guidance, and real-time road hazard alerts.
-                No coordinates required.
+                {t('role.driverFullDesc')}
               </p>
             </div>
             <span className="role-option-arrow" aria-hidden="true">
@@ -57,19 +59,18 @@ export default function RoleSelect({ onSelectMode }: RoleSelectProps) {
             type="button"
             className="role-option-btn role-option-operations"
             onClick={() => onSelectMode('operations')}
-            aria-label="Open Operations Command Center"
+            aria-label={t('role.operationsName')}
           >
             <div className="role-option-icon" aria-hidden="true">
               <Icon name="terminal" size={26} color="var(--color-accent-amber)" />
             </div>
             <div className="role-option-content">
               <div className="role-option-headline">
-                <span className="role-option-name">Operations Center</span>
-                <span className="role-option-badge role-badge-ops">Dispatcher Hub</span>
+                <span className="role-option-name">{t('role.operationsName')}</span>
+                <span className="role-option-badge role-badge-ops">{t('role.operationsBadge')}</span>
               </div>
               <p className="role-option-desc">
-                Full logistics intelligence platform: multi-corridor monitoring, fleet telemetry, hazard catalogs, and
-                detailed GIS risk analysis.
+                {t('role.operationsFullDesc')}
               </p>
             </div>
             <span className="role-option-arrow" aria-hidden="true">
@@ -79,7 +80,7 @@ export default function RoleSelect({ onSelectMode }: RoleSelectProps) {
         </div>
 
         <div className="role-select-footer">
-          <span>Your selection will be remembered on this device.</span>
+          <span>{t('role.footer')}</span>
         </div>
       </div>
     </div>

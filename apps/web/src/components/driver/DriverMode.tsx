@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type {
   RouteOptimizationResult,
   AlertRecord,
@@ -54,6 +55,7 @@ export default function DriverMode({
   onNewTrip,
   liveProgress,
 }: DriverModeProps) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<DriverTab>('navigate');
 
   const showMapOverlay = Boolean(optimization) && activeTab === 'navigate';
@@ -112,7 +114,7 @@ export default function DriverMode({
                     minHeight: 44,
                   }}
                 >
-                  Change Destination / New Trip
+                  {t('driver.newTrip')}
                 </button>
               )}
             </div>
@@ -143,10 +145,10 @@ export default function DriverMode({
             <div className="driver-stack">
               <div className="driver-card">
                 <div className="driver-nav-header">
-                  <span className="driver-nav-title">DRIVER SESSION</span>
+                  <span className="driver-nav-title">{t('driver.session')}</span>
                 </div>
                 <p className="driver-route-foot" style={{ marginBottom: 16 }}>
-                  Active trip monitoring is running. You can start a new trip, adjust routing, or switch to the Command Center.
+                  {t('driver.sessionDesc')}
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {onNewTrip && (
@@ -160,7 +162,7 @@ export default function DriverMode({
                       style={{ minHeight: 46, background: 'var(--color-accent-amber)', color: 'var(--color-bg-deep)', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
                     >
                       <Icon name="target" size={16} color="var(--color-bg-deep)" />
-                      <span>Change Destination / New Trip</span>
+                      <span>{t('driver.newTrip')}</span>
                     </button>
                   )}
                   <button
@@ -170,7 +172,7 @@ export default function DriverMode({
                     style={{ minHeight: 46, background: 'var(--color-bg-base)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
                   >
                     <Icon name="terminal" size={16} color="var(--color-text-muted)" />
-                    <span>Switch to Operations Command Center</span>
+                    <span>{t('driver.switchToOps')}</span>
                   </button>
                 </div>
               </div>

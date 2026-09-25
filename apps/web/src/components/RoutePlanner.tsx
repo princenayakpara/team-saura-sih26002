@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { RoutingPreference } from '../types/api';
 import { PRESET_CORRIDORS } from '../config/map-theme';
 import { Icon } from './common/Icon';
@@ -23,6 +24,8 @@ export default function RoutePlanner({
   onCalculate,
   isRouting,
 }: RoutePlannerProps) {
+  const { t } = useTranslation();
+
   const activePreset = PRESET_CORRIDORS.find(
     (p) => p.origin === originInput && p.destination === destInput
   );
@@ -38,7 +41,7 @@ export default function RoutePlanner({
       <div className="intel-card-header">
         <span className="intel-card-title">
           <Icon name="compass" size={15} style={{ color: 'var(--accent-action)' }} />
-          <span>Route Planner</span>
+          <span>{t('route.planner')}</span>
         </span>
         {activePreset && (
           <span style={{ fontSize: 11, color: 'var(--accent-action)', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
@@ -68,7 +71,7 @@ export default function RoutePlanner({
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 12 }}>
         <div>
           <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
-            <Icon name="pin-start" size={13} style={{ color: 'var(--status-safe)' }} /> Origin (Latitude, Longitude):
+            <Icon name="pin-start" size={13} style={{ color: 'var(--status-safe)' }} /> {t('route.originLabel')}
           </label>
           <input
             type="text"
@@ -77,13 +80,13 @@ export default function RoutePlanner({
             placeholder="26.1445, 91.7362"
             disabled={isRouting}
             className="coord-input"
-            aria-label="Origin coordinates"
+            aria-label={t('route.originLabel')}
           />
         </div>
 
         <div>
           <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
-            <Icon name="pin-end" size={13} style={{ color: 'var(--status-critical)' }} /> Destination (Latitude, Longitude):
+            <Icon name="pin-end" size={13} style={{ color: 'var(--status-critical)' }} /> {t('route.destLabel')}
           </label>
           <input
             type="text"
@@ -92,7 +95,7 @@ export default function RoutePlanner({
             placeholder="25.5788, 91.8933"
             disabled={isRouting}
             className="coord-input"
-            aria-label="Destination coordinates"
+            aria-label={t('route.destLabel')}
           />
         </div>
       </div>
@@ -100,11 +103,12 @@ export default function RoutePlanner({
       {/* Routing Preference Selector */}
       <div style={{ marginBottom: 14 }}>
         <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: 6 }}>
-          Routing Objective
+          {t('route.routingObjective')}
         </label>
         <div style={{ display: 'flex', gap: 6 }}>
           {(['FASTEST', 'BALANCED', 'SAFEST'] as RoutingPreference[]).map((mode) => {
             const isSelected = preference === mode;
+            const label = mode === 'FASTEST' ? t('route.fastest') : mode === 'BALANCED' ? t('route.balanced') : t('route.safest');
             return (
               <button
                 key={mode}
@@ -131,7 +135,7 @@ export default function RoutePlanner({
                   name={mode === 'FASTEST' ? 'clock' : mode === 'BALANCED' ? 'scale' : 'shield'}
                   size={12}
                 />
-                <span>{mode === 'FASTEST' ? 'Fastest' : mode === 'BALANCED' ? 'Balanced' : 'Safest'}</span>
+                <span>{label}</span>
               </button>
             );
           })}
@@ -158,10 +162,10 @@ export default function RoutePlanner({
                 animation: 'spin 0.8s linear infinite',
               }}
             />
-            <span>CALCULATING ROUTE...</span>
+            <span>{t('route.calculating')}</span>
           </>
         ) : (
-          <span>CALCULATE ROUTE</span>
+          <span>{t('route.calculate')}</span>
         )}
       </button>
     </div>
